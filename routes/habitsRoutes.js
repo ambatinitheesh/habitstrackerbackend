@@ -1,134 +1,173 @@
 const express = require("express");
 const router = express.Router();
-const habitsController = require("../controllers/habitsController");
+const habitController = require("../controllers/habitsController");
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Habit:
- *       type: object
- *       required:
- *         - title
- *         - time
- *         - type
- *         - status
- *       properties:
- *         id:
- *           type: integer
- *           description: The auto-generated ID of the habit
- *         title:
- *           type: string
- *           description: The habit title
- *         time:
- *           type: string
- *           description: The time of the habit
- *         type:
- *           type: string
- *           description: The type of habit (e.g., exercise, reading)
- *         status:
- *           type: boolean
- *           description: The habit completion status
- */
-
-/**
- * @swagger
- * /habits:
+ * /users/{userId}/habits:
  *   post:
- *     summary: Create a new habit
+ *     summary: Add a new habit for a user
  *     tags: [Habits]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Habit'
+ *             type: object
+ *             required:
+ *               - title
+ *               - time
+ *               - type
+ *             properties:
+ *               title:
+ *                 type: string
+ *               time:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               status:
+ *                 type: boolean
  *     responses:
  *       201:
- *         description: Habit Created
- *       500:
- *         description: Server Error
- */
-router.post("/habits", habitsController.createHabit);
-
-/**
- * @swagger
- * /habits:
- *   get:
- *     summary: Get all habits
- *     tags: [Habits]
- *     responses:
- *       200:
- *         description: List of habits
- *       500:
- *         description: Server Error
- */
-router.get("/habits", habitsController.getAllHabits);
-
-/**
- * @swagger
- * /habits/{id}:
- *   get:
- *     summary: Get habit by ID
- *     tags: [Habits]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Habit Found
+ *         description: Habit created
  *       404:
- *         description: Habit Not Found
+ *         description: User not found
  */
-router.get("/habits/:id", habitsController.getHabitById);
+router.post("/users/:userId/habits", habitController.createHabit);
 
 /**
  * @swagger
- * /habits/{id}:
- *   put:
- *     summary: Update habit by ID
+ * /users/{userId}/habits:
+ *   get:
+ *     summary: Get all habits for a user
  *     tags: [Habits]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID of the user
+ *     responses:
+ *       200:
+ *         description: List of user's habits
+ *       404:
+ *         description: User not found
+ */
+router.get("/users/:userId/habits", habitController.getUserHabits);
+/**
+ * @swagger
+ * /users/{userId}/get-by-date:
+ *   get:
+ *     summary: Get habits by date for a user
+ *     description: Fetch habits created by a specific user on a given date.
+ *     tags:
+ *       - Habits
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the user
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The date in dd-mm-yyyy format
+ *     responses:
+ *       200:
+ *         description: List of habits for the specified date
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 habits:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       title:
+ *                         type: string
+ *                       userId:
+ *                         type: integer
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *       400:
+ *         description: Bad request if userId or date are missing
+ *       500:
+ *         description: Server error
+ */
+router.get('/users/:userId/get-by-date', habitController.getHabitsByDate);
+
+/**
+ * @swagger
+ * /habits/{habitId}:
+ *   put:
+ *     summary: Update a habit
+ *     tags: [Habits]
+ *     parameters:
+ *       - in: path
+ *         name: habitId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the habit
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Habit'
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               time:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               status:
+ *                 type: boolean
  *     responses:
  *       200:
- *         description: Habit Updated
+ *         description: Habit updated successfully
  *       404:
- *         description: Habit Not Found
+ *         description: Habit not found
  */
-router.put("/habits/:id", habitsController.updateHabit);
+router.put("/habits/:habitId", habitController.updateHabit);
 
 /**
  * @swagger
- * /habits/{id}:
+ * /habits/{habitId}:
  *   delete:
- *     summary: Delete habit by ID
+ *     summary: Delete a habit
  *     tags: [Habits]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: habitId
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID of the habit
  *     responses:
  *       200:
- *         description: Habit Deleted
+ *         description: Habit deleted successfully
  *       404:
- *         description: Habit Not Found
+ *         description: Habit not found
  */
-router.delete("/habits/:id", habitsController.deleteHabit);
+router.delete("/habits/:habitId", habitController.deleteHabit);
 
 module.exports = router;

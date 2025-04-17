@@ -16,17 +16,17 @@ const Habit = sequelize.define("Habit", {
         allowNull: false,
     },
     type: {
-        type: DataTypes.STRING, // e.g., "Exercise", "Reading", "Meditation"
+        type: DataTypes.STRING,
         allowNull: false,
     },
     status: {
-        type: DataTypes.BOOLEAN, // true (completed), false (pending)
+        type: DataTypes.BOOLEAN,
         defaultValue: false,
     },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    }
 });
-
-sequelize.sync({}) // Creates the table if it doesn't exist
-    .then(() => console.log("✅ Habits table created"))
-    .catch((err) => console.error("❌ Error creating table:", err));
 
 module.exports = Habit;
